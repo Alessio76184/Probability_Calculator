@@ -1,0 +1,62 @@
+import copy
+import random
+
+class Hat:
+  def __init__(self, **colours):
+    self.contents = []
+    for colour, quantity in colours.items():
+      self.contents += [colour] * quantity
+
+  def draw(self, number_of_balls):
+    try:
+      balls = random.sample(self.contents, number_of_balls)
+    except:
+      balls = copy.deepcopy(self.contents)
+
+    for ball in balls:
+      self.contents.remove(ball)
+
+    return balls
+  
+#### Experiment function ####
+
+def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
+  M = 0
+  for i in range(num_experiments):
+    hat_copy = copy.deepcopy(hat)
+    balls = hat_copy.draw(num_balls_drawn)
+    if contains_balls(expected_balls, balls):
+        M += 1
+
+  probability = M / num_experiments
+  return probability
+
+##### Tracking the balls occurance and confirming returns #####
+
+def contains_balls(expected_balls, actual_balls):
+# Count the occurrences of each color in actual balls
+  actual_count = {color: actual_balls.count(color) for color in set(actual_balls)}
+
+# Check if actual balls have at least as many occurrences of each color as expected
+  for color, count in expected_balls.items():
+    if color not in actual_count or actual_count[color] < count:
+      return False
+
+  return True
+
+##### TEST #####
+
+hat1 = Hat(yellow=3, blue=2, green=6)
+hat2 = Hat(red=5, orange=4)
+hat3 = Hat(red=5, black=1, blue=9, pink=2, striped=4)
+
+print('\n')
+
+print(hat1.draw(2))
+
+print('\n')
+
+hat = Hat(black=6, red=4, green=3)
+probability = experiment(hat=hat, expected_balls={"red":2,"green":1}, num_balls_drawn=5,num_experiments=2000)
+
+print(probability)
